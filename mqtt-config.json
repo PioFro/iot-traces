@@ -1,0 +1,7 @@
+{
+  "id":"UNIQUEID",
+  "broker ip": "192.168.100.209",
+  "sub topics": ["topic11","topic2","topic3"],
+  "pub topics": ["topic11-1","topic12-2","topic13-3"],
+  "qos": 0
+}
