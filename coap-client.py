@@ -5,6 +5,8 @@ from aiocoap import *
 
 logging.basicConfig(level=logging.INFO)
 
+rqType = sys.argv[2]
+
 async def main():
     """Perform a single PUT request to localhost on the default port, URI
     "/other/block". The request is sent 2 seconds after initialization.
@@ -16,7 +18,18 @@ async def main():
     await asyncio.sleep(2)
 
     payload = b"The quick brown fox jumps over the lazy dog.\n" * 30
-    request = Message(code=GET, payload=payload, uri="coap://{}/time".format(sys.argv[1]))
+    if rqType == "time":
+        request = Message(code=GET, uri="coap://{}/time".format(sys.argv[1]))
+
+    if rqType == "block-get":
+        request = Message(code=GET, payload=payload,uri="coap://{}/other/block".format(sys.argv[1]))
+
+    if rqType == "block-put":
+        request = Message(code=PUT, payload=payload, uri="coap://{}/other/block".format(sys.argv[1]))
+
+    if rqType == "separate":
+        request = Message(code=GET, uri="coap://{}/other/separate".format(sys.argv[1]))
+
 
     response = await context.request(request).response
 

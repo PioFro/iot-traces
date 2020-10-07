@@ -3,7 +3,9 @@ import logging
 import asyncio
 import aiocoap.resource as resource
 import aiocoap
-
+import random
+import requests
+import coapconfig as config
 
 class BlockResource(resource.Resource):
     """Example resource which supports the GET and PUT methods. It sends large
@@ -21,6 +23,12 @@ class BlockResource(resource.Resource):
             self.content = self.content + b"0123456789\n"
 
     async def render_get(self, request):
+        if random.randint(0,1) ==0:
+            self.content = self.content[0:-1]
+            print("shorter msg")
+        else:
+            self.content+=b""+bytes(random.randint(0,9))
+            print("longer msg")
         return aiocoap.Message(payload=self.content)
 
     async def render_put(self, request):
@@ -39,12 +47,11 @@ class SeparateLargeResource(resource.Resource):
         return dict(**super().get_link_description(), title="A large resource")
 
     async def render_get(self, request):
-        await asyncio.sleep(3)
-
-        payload = "Three rings for the elven kings under the sky, seven rings "\
+        await asyncio.sleep(random.randint(0,5))
+        payload = ("Three rings for the elven kings under the sky, seven rings "\
                 "for dwarven lords in their halls of stone, nine rings for "\
                 "mortal men doomed to die, one ring for the dark lord on his "\
-                "dark throne.".encode('ascii')
+                "dark throne."*random.randint(0,5)).encode('ascii')
         return aiocoap.Message(payload=payload)
 
 class TimeResource(resource.ObservableResource):
@@ -84,6 +91,7 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("coap-server").setLevel(logging.DEBUG)
 
 def main():
+
     # Resource tree creation
     root = resource.Site()
 
@@ -98,4 +106,5 @@ def main():
     asyncio.get_event_loop().run_forever()
 
 if __name__ == "__main__":
+    requests.get("http://{}:5000/newip/{}".format(config.IPMANAGERIP,config.MYIP))
     main()
